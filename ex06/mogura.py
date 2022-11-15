@@ -5,9 +5,7 @@ import numpy as np
 import time
 from threading import Thread
 
-# タイマー時間を設定
-TIME = 60
-
+TIME = 60 # タイマー時間を設定
 
 class Screen:
     """スクリーンに関する処理"""
@@ -71,9 +69,6 @@ class Hole:
             txt = font2.render("+{}".format(self.mogurapoint), True, (0, 0, 0))
             self.scr.sfc.blit(txt, self.pos)
             
-
-
-
 
 class Mogura:
     """モグラを生成、出現処理を実装"""
@@ -139,6 +134,7 @@ class Mogura:
         # hole(Hole)クラスのset関数にモグラごとの得点Mogura.pointを引数で渡す
         self.hole.set(self.point)          
 
+
 class Bird:
     """こうかとんによる妨害プログラム"""
     def __init__(self, scr: Screen, img_path, zoom, xy):
@@ -177,15 +173,15 @@ class Bird:
 
 
 class Hammer: # C0B21061
+    """ハンマーを生成"""
     def __init__(self, img, zoom, center):
-        sfc = pg.image.load(img)
-        self.sfc = pg.transform.scale(sfc, zoom)
+        self.sfc = pg.image.load(img) 
+        self.sfc = pg.transform.scale(self.sfc, zoom) # zoomの大きさに合わせる
         self.rct = self.sfc.get_rect()
         self.rct.center = center
 
     def update(self, mouse_xy):
-        # 位置をマウスカーソルに合わせる
-        self.rct.center = mouse_xy 
+        self.rct.center = mouse_xy # 位置をマウスカーソルに合わせる
 
     def blit(self, scr:Screen):
         scr.sfc.blit(self.sfc, self.rct)
@@ -223,8 +219,10 @@ def bgm(bgm_num): #C0B21049
 def main():
     # スクリーン
     scr = Screen("pygame", (800, 800), "fig/sougenn.jpg")
+
     # マウスカーソルの非表示
     pg.mouse.set_visible(False)
+
     # 穴、モグラ作成
     basex = 40; basey = 150     # x/yの起点
     width = 200; height = 130   # x/y軸方向の幅
@@ -232,10 +230,13 @@ def main():
     holes = [[Hole(scr, (basex + x*width, basey + y*height)), Mogura(scr)]
                 for x in range(xn) 
                 for y in range(yn)]
+
     # こうかとん
     bird = Bird(scr, "fig/6.png", 1.8, (basex + 50, basey - 10))
+
     #ハンマー C0B21061
     hammer = Hammer("fig/piko.png", (100, 100), (400, 400))
+
     # クロック
     clock = pg.time.Clock()
     # タイマー
@@ -245,16 +246,20 @@ def main():
     while True:
         # 背景作成
         scr.blit()
+
         # イベント取得
         events = pg.event.get()
+
         # ×で終了
         for event in events:            
             if event.type == pg.QUIT: return
+
         # 左上のパラメータ
         fonts = pg.font.Font(None, 40)
         txt = f"score:{Mogura.KILLS}  time:{TIME}"
         txt = fonts.render(str(txt), True, (0, 0, 0))
         scr.sfc.blit(txt, (10, 20))
+        
         # hole処理
         for hole in holes:
             hole[0].blit()
@@ -270,13 +275,15 @@ def main():
                         hole[1].click()                                                         # Moguraクラスのclickメソッド呼び出し
             else:                                                                       # Moguraクラスの処理待機カウントが0以外なら
                 hole[1].COOL_TIME -= 1                                                      # 処理待機カウント -1
+
         # bird(heightは、穴やモグラのy軸方向の幅)
         bird.update(basey, height, yn)
 
         # マウスカーソルによる更新処理 C0B21061
         for event in events:
             if event.type == pg.MOUSEMOTION:
-                hammer.update(pg.mouse.get_pos())
+                hammer.update(pg.mouse.get_pos()) #マウスカーソルの座標を引数に入れる
+
         # ハンマーを描写 
         hammer.blit(scr)
 
@@ -285,6 +292,7 @@ def main():
             bgm(1) #C0B21049
             timeup(scr)
             return
+
         # クロック 
         clock.tick(1000)  
         pg.display.update()
